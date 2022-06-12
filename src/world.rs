@@ -1,13 +1,13 @@
 use crate::hittable::{Hittable, HitRecord};
 use crate::ray::Ray;
 
-pub struct World {
-    objects: Vec<Box<dyn Hittable>>,
+pub struct World<'a> {
+    objects: Vec<Box<dyn Hittable + 'a>>,
 }
 
-impl World
+impl<'a> World<'a>
 {
-    pub fn new() -> World {
+    pub fn new() -> World<'a> {
         World {
             objects: vec![]
         }
@@ -17,7 +17,7 @@ impl World
         self.objects.clear();
     }
 
-    pub fn add(&mut self, object: Box<dyn Hittable>) {
+    pub fn add(&mut self, object: Box<dyn Hittable + 'a>) {
         self.objects.push(object);
     }
 

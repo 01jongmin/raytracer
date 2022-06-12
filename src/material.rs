@@ -19,13 +19,24 @@ impl Material for Lambertian {
 }
 
 pub struct Metal {
-    pub color: Vec3
+    color: Vec3,
+    fuzziness: f64,
+}
+
+impl Metal {
+    pub fn new(color: Vec3, fuzziness: f64) -> Metal {
+        let fuzziness = if fuzziness < 1. { fuzziness } else { 1. };
+        Metal {
+            color,
+            fuzziness
+        }
+    }
 }
 
 impl Material for Metal {
     fn scatter(&self, ray: &Ray, hit_record: &HitRecord) -> Option<(Ray, Vec3)> {
         let reflected_vector = Vec3::reflect(ray.direction().unit_vector(), hit_record.normal());
-        let scattered = Ray::new(hit_record.point(), reflected_vector);
+        let scattered = Ray::new(hit_record.point(), reflected_vector + Vec3::random_in_unit_sphere() * self.fuzziness); 
 
         // TODO: Why is there a > 0. if statement?
         if Vec3::dot(&scattered.direction(), &hit_record.normal()) > 0. {

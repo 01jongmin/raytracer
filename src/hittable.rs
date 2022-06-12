@@ -3,16 +3,16 @@ use crate::vec3::Vec3;
 use crate::material::Material;
 use std::rc::Rc;
 
-pub struct HitRecord {
+pub struct HitRecord<'a> {
     point: Vec3,
     normal: Vec3,
-    pub material: Rc<dyn Material>,
+    pub material: &'a dyn Material,
     t: f64,
     front_face: bool,
 }
 
-impl HitRecord {
-    pub fn new(point: Vec3, normal: Vec3, material: Rc<dyn Material>, t: f64, front_face: bool) -> HitRecord {
+impl<'a> HitRecord<'a> {
+    pub fn new(point: Vec3, normal: Vec3, material: &'a dyn Material, t: f64, front_face: bool) -> HitRecord {
         HitRecord {
             point,
             normal,

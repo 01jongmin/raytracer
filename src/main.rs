@@ -52,37 +52,35 @@ fn main() -> std::io::Result<()> {
     let mut buffer = File::create(filename)?;
     write!(&mut buffer, "P3\n{} {}\n255\n", image_width, image_height)?;
 
-    let mut world = World::new();
-
-
     let material_ground = Lambertian{color: Vec3::new(0.8, 0.8, 0.0)};
     let material_center = Lambertian{color: Vec3::new(0.7, 0.3, 0.3)};
-    let material_left   = Metal{ color: Vec3::new(0.8, 0.8, 0.8) };
-    let material_right  = Metal{ color: Vec3::new(0.8, 0.6, 0.2) };
+    let material_left   = Metal::new(Vec3::new(0.8, 0.8, 0.8), 0.3);
+    let material_right  = Metal::new(Vec3::new(0.8, 0.6, 0.2), 1.0);
 
+    let mut world = World::new();
 
     let center_sphere = Sphere::new(
         Vec3::new(0., 0., -1.),
         0.5,
-        Rc::new(material_center),
+        &material_center
     );
 
     let green_sphere = Sphere::new(
         Vec3::new(0., -100.5, -1.),
         100.,
-        Rc::new(material_ground),
+        &material_ground
     );
 
     let left_sphere = Sphere::new(
         Vec3::new(-1., 0., -1.),
         0.5,
-        Rc::new(material_left),
+        &material_left,
     );
 
     let right_sphere = Sphere::new(
         Vec3::new(1., 0., -1.),
         0.5,
-        Rc::new(material_right),
+        &material_right,
     );
 
     world.add(Box::new(center_sphere));
@@ -90,7 +88,7 @@ fn main() -> std::io::Result<()> {
     world.add(Box::new(left_sphere));
     world.add(Box::new(right_sphere));
 
-    let samples_per_pixel = 10;
+    let samples_per_pixel = 100;
     let max_depth: u64 = 100;
     let camera = Camera::new();
 

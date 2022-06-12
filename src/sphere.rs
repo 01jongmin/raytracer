@@ -4,14 +4,14 @@ use crate::ray::Ray;
 use crate::material::Material;
 use std::rc::Rc;
 
-pub struct Sphere {
+pub struct Sphere<'a> {
     center: Vec3,
     radius: f64,
-    material: Rc<dyn Material>,
+    material: &'a dyn Material,
 }
 
-impl Sphere {
-    pub fn new(center: Vec3, radius: f64, material: Rc<dyn Material>) -> Sphere {
+impl<'a> Sphere<'a> {
+    pub fn new(center: Vec3, radius: f64, material: &'a dyn Material) -> Sphere<'a> {
         Sphere {
             center,
             radius,
@@ -20,7 +20,7 @@ impl Sphere {
     }
 }
 
-impl Hittable for Sphere {
+impl<'a> Hittable for Sphere<'a> {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = ray.origin() - self.center;
         let a = ray.direction().length_squared();
@@ -44,7 +44,7 @@ impl Hittable for Sphere {
                     return Some(HitRecord::new(
                         point,
                         normal,
-                        Rc::clone(&self.material),
+                        self.material,
                         *root,
                         front_face,
                     ));
