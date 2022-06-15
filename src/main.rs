@@ -17,6 +17,9 @@ use sphere::Sphere;
 use camera::Camera;
 use material::{ Lambertian, Metal };
 use utils::{ clamp, random_double };
+use image;
+use rayon::prelude::*;
+use std::sync::Arc;
 
 fn ray_color(ray: &Ray, world: &World, depth_limit: u64) -> Vec3 {
     if depth_limit <= 0 {
@@ -42,15 +45,13 @@ fn ray_color(ray: &Ray, world: &World, depth_limit: u64) -> Vec3 {
 }
 
 fn main() -> std::io::Result<()> {
-    let filename = "linear_interpolatidon_v1.ppm";
-
     // width over height
     let aspect_ratio = 16.0 / 9.0;
     let image_width = 400;
-    let image_height = (image_width as f64 / aspect_ratio) as i64;
+    let image_height = (image_width as f64 / aspect_ratio) as u32;
 
-    let mut buffer = File::create(filename)?;
-    write!(&mut buffer, "P3\n{} {}\n255\n", image_width, image_height)?;
+    //let mut buffer = File::create(filename)?;
+    //write!(&mut buffer, "P3\n{} {}\n255\n", image_width, image_height)?;
 
     let material_ground = Lambertian{color: Vec3::new(0.8, 0.8, 0.0)};
     let material_center = Lambertian{color: Vec3::new(0.7, 0.3, 0.3)};
@@ -91,22 +92,57 @@ fn main() -> std::io::Result<()> {
     let samples_per_pixel = 100;
     let max_depth: u64 = 100;
     let camera = Camera::new();
+    let arc_world = Arc::new(world);
 
-    for row in (0..image_height).rev() {
-        println!("{}", row);
-        for col in 0..image_width {
-            let mut pixel_color = Vec3::new(0., 0., 0.);
-            for _ in 0..samples_per_pixel {
-                let u = (col as f64 + random_double()) / (image_width - 1) as f64;
-                let v = (row as f64 + random_double()) / (image_height - 1) as f64;
-                let ray = camera.get_ray(u, v);
-                pixel_color += ray_color(&ray, &world, max_depth);
-            }
+    let buffer = (0..image_width*image_height)
+                    .into_par_iter()
+                    .flat_map(|i| {
+                        let col = i % image_width;
+                        let row = i / image_width;
+                        println!("{}", i);
+                        
+                        let u = (col as f64 + random_double()) / (image_width - 1) as f64;
+                        let v = (row as f64 + random_double()) / (image_height - 1) as f64;
+                        //let mut pixel_color = Vec3::constant_new(0.);
 
-            pixel_color = pixel_color / (samples_per_pixel as f64);
-            write!(&mut buffer, "{:?}", pixel_color)?;
-        }
-    }
+                        let ray = camera.get_ray(u, v);
+                        let mut pixel_color = ray_color(&ray, &arc_world, max_depth);
+
+                        //let pixel_color: Vec3 = (0..samples_per_pixel)
+                                                    //.into_par_iter()
+                                                    //.map(|_| {
+                                                    //})
+                        //let pixel_color: Vec3 = (0..samples_per_pixel)
+                                            //.map(|_| {
+                                                //let u = (col as f64 + random_double()) / (image_width - 1) as f64;
+                                                //let v = (row as f64 + random_double()) / (image_height - 1) as f64;
+                                                //let ray = camera.get_ray(u, v);
+                                                //ray_color(&ray, &world, max_depth)
+                                            //})
+                                            //.sum();
+                                            
+
+                        pixel_color.rgb()
+                    })
+                    .collect::<Vec<u8>>();
+
+    image::save_buffer("image.png", &buffer[..], image_width, image_height, image::ColorType::Rgb8).unwrap();
+                    
+    //for row in (0..image_height).rev() {
+        //println!("{}", row);
+        //for col in 0..image_width {
+            //let mut pixel_color = Vec3::new(0., 0., 0.);
+            //for _ in 0..samples_per_pixel {
+                //let u = (col as f64 + random_double()) / (image_width - 1) as f64;
+                //let v = (row as f64 + random_double()) / (image_height - 1) as f64;
+                //let ray = camera.get_ray(u, v);
+                //pixel_color += ray_color(&ray, &world, max_depth);
+            //}
+
+            //pixel_color = pixel_color / (samples_per_pixel as f64);
+            //write!(&mut buffer, "{:?}", pixel_color)?;
+        //}
+    //}
 
     Ok(())
 }

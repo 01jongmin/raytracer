@@ -1,6 +1,7 @@
 use crate::utils::{ random_double, random_double_range };
 use std::ops::{Add, AddAssign, Sub, SubAssign, Div, DivAssign, Mul, MulAssign, Neg};
 use core::fmt;
+use std::iter::Sum;
 
 #[derive(Clone, Copy)]
 pub struct Vec3 {
@@ -47,6 +48,12 @@ impl Vec3 {
 
     pub fn random_unit_vector() -> Vec3 {
         Vec3::random_in_unit_sphere().unit_vector()
+    }
+
+    pub fn rgb(&self) -> Vec<u8> {
+        vec![(f64::sqrt(self.x()) * 255.999) as u8,
+             (f64::sqrt(self.y()) * 255.999) as u8,
+             (f64::sqrt(self.z()) * 255.999) as u8]
     }
 }
 
@@ -236,7 +243,22 @@ impl Neg for Vec3 {
         }
     }
 }
-    //pub fn build_point(x: f64, y: f64, z: f64) -> Vec3 {
+
+//impl Sum for Vec3 {
+    //fn sum<I>(iter: I) -> Self 
+         //where
+        //I: Iterator<Item = Self>
+    //{
+        //iter.reduce(|accum, item| {
+            //accum += item;
+        //})
+    //}
+//}
+
+//impl std::iter::Iterator::sum for Vec3 {
+
+//}
+//pub fn build_point(x: f64, y: f64, z: f64) -> Vec3 {
         //Vec3 {
             //x,
             //y,
