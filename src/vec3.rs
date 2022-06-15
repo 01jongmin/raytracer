@@ -244,16 +244,14 @@ impl Neg for Vec3 {
     }
 }
 
-//impl Sum for Vec3 {
-    //fn sum<I>(iter: I) -> Self 
-         //where
-        //I: Iterator<Item = Self>
-    //{
-        //iter.reduce(|accum, item| {
-            //accum += item;
-        //})
-    //}
-//}
+impl Sum for Vec3 {
+    fn sum<I>(iter: I) -> Self 
+         where
+        I: Iterator<Item = Self>
+    {
+        iter.fold(Vec3::constant_new(0.0), |a, b| a + b)
+    }
+}
 
 //impl std::iter::Iterator::sum for Vec3 {
 
