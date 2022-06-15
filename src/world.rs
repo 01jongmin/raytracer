@@ -2,7 +2,7 @@ use crate::hittable::{Hittable, HitRecord};
 use crate::ray::Ray;
 
 pub struct World<'a> {
-    objects: Vec<Box<dyn Hittable + Send + Sync + 'a>>,
+    objects: Vec<Box<dyn Hittable + 'a>>,
 }
 
 impl<'a> World<'a>

@@ -2,7 +2,6 @@ use crate::hittable::{ Hittable, HitRecord };
 use crate::vec3::Vec3;
 use crate::ray::Ray;
 use crate::material::Material;
-use std::rc::Rc;
 
 pub struct Sphere<'a> {
     center: Vec3,
