@@ -40,29 +40,30 @@ fn ray_color(ray: &Ray, world: &World, depth_limit: usize) -> Vec3 {
     }
 }
 
-pub fn raytrace(name: &str, image_width: usize, image_height: usize, samples_per_pixel: usize, max_depth: usize, world: &World, camera: &Camera) {
+pub fn raytrace(name: &str, image_width: usize, image_height: usize, samples_per_pixel: usize, 
+                max_depth: usize, world: &World, camera: &Camera) {
     let buffer = (0..image_width*image_height)
                     .into_par_iter()
                     .flat_map(|i| {
                         let col = i % image_width;
                         let row = i / image_width;
 
-                        let pixel_color: Vec3 = (0..samples_per_pixel)
-                                                .into_par_iter()
-                                                .map(|_| {
-                                                    let u = (col as f64 + random_double()) / (image_width - 1) as f64;
-                                                    let v = 1. - (row as f64 + random_double()) / (image_height - 1) as f64;
-                                                    //let mut pixel_color = Vec3::constant_new(0.);
+                        let pixel_color: Vec3 = 
+                            (0..samples_per_pixel)
+                                .into_par_iter()
+                                .map(|_| {
+                                    let u = (col as f64 + random_double()) / (image_width - 1) as f64;
+                                    let v = 1. - (row as f64 + random_double()) / (image_height - 1) as f64;
+                                    //let mut pixel_color = Vec3::constant_new(0.);
 
-                                                    let ray = camera.get_ray(u, v);
-                                                    ray_color(&ray, &world, max_depth)
-                                                })
-                                                .sum();
+                                    let ray = camera.get_ray(u, v);
+                                    ray_color(&ray, &world, max_depth)
+                                })
+                                .sum();
 
                         (pixel_color / samples_per_pixel as f64).rgb()
                     })
                     .collect::<Vec<u8>>();
-
     
     image::save_buffer(name, &buffer[..], image_width as u32, image_height as u32, image::ColorType::Rgb8).unwrap();
 }
