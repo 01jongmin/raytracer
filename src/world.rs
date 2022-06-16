@@ -17,7 +17,7 @@ impl<'a> World<'a>
         self.objects.clear();
     }
 
-    pub fn add(&mut self, object: Box<dyn Hittable + Send + Sync + 'a>) {
+    pub fn add(&mut self, object: Box<dyn Hittable + 'a>) {
         self.objects.push(object);
     }
 

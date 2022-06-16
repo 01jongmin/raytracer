@@ -1,7 +1,6 @@
 use crate::ray::Ray;
 use crate::vec3::Vec3;
 use crate::material::Material;
-use std::rc::Rc;
 
 pub struct HitRecord<'a> {
     point: Vec3,
@@ -32,6 +31,10 @@ impl<'a> HitRecord<'a> {
 
     pub fn point(&self) -> Vec3 {
         self.point
+    }
+
+    pub fn front_face(&self) -> bool {
+        self.front_face
     }
 }
     

@@ -44,6 +44,15 @@ impl Vec3 {
         }
     }
 
+    pub fn random_in_unit_disk() -> Vec3 {
+        loop {
+            let mut p = Vec3::random_range(-1., 1.);
+            p.z = 0.;
+            if p.length_squared() >= 1. { continue; }
+            return p;
+        }
+    }
+
     pub fn random_unit_vector() -> Vec3 {
         Vec3::random_in_unit_sphere().unit_vector()
     }
@@ -60,8 +69,23 @@ impl Vec3 {
         u.x() * v.x() + u.y() * v.y() + u.z() * v.z()
     }
 
+    pub fn cross(u: &Vec3, v: &Vec3) -> Vec3 {
+        Vec3 {
+            x: u.y() * v.z() - u.z() * v.y(),
+            y: u.z() * v.x() - u.x() * v.z(),
+            z: u.x() * v.y() - u.y() * v.x(),
+        }
+    }
+
     pub fn reflect(v: Vec3, n: Vec3) -> Vec3 {
         v - n * 2. * Vec3::dot(&v , &n)
+    }
+
+    pub fn refract(uv: Vec3, n: Vec3, etai_over_etat: f64) -> Vec3 {
+        let cos_theta = f64::min(Self::dot(&(uv * -1.), &n), 1.);
+        let r_out_perp = (uv + n * cos_theta) * etai_over_etat;
+        let r_out_parallel = n * -f64::sqrt(f64::abs(1. - r_out_perp.length_squared()));
+        r_out_perp + r_out_parallel
     }
 }
 
@@ -250,15 +274,3 @@ impl Sum for Vec3 {
         iter.fold(Vec3::constant_new(0.0), |a, b| a + b)
     }
 }
-
-//impl std::iter::Iterator::sum for Vec3 {
-
-//}
-//pub fn build_point(x: f64, y: f64, z: f64) -> Vec3 {
-        //Vec3 {
-            //x,
-            //y,
-            //z,
-            //// if there was w then assign 1
-        //}
-    //}
