@@ -1,0 +1,22 @@
+[package]
+name = "raytracer-server"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+actix-web = "4.1.0"
+env_logger = "0.9"
+futures-util = { version = "0.3.7", default-features = false, features = ["std"] }
+futures-core = "0.3.21"
+log = "0.4"
+parking_lot = "0.12"
+tokio = { version = "1.16", features = ["sync"] }
+tokio-stream = { version = "0.1.8", features = ["time", "sync"] }
+async-stream = "0.3.3"
+
+futures = "0.3.21"
+
+raytracer = { version = "0.1.0", path = "../raytracer-renderer" }
+image = "0.24.2"
+
+indexmap = "=1.6.2"

@@ -15,10 +15,10 @@ use camera::Camera;
 use utils::{ random_double, random_double_range };
 use material::{ Material, Lambertian, Metal, Dielectric };
 use sphere::Sphere;
-use hittable::Hittable;
 
 use image;
 use rayon::prelude::*;
+use std::sync::Arc;
 
 fn ray_color(ray: &Ray, world: &World, depth_limit: usize) -> Vec3 {
     if depth_limit <= 0 {
@@ -44,7 +44,7 @@ fn ray_color(ray: &Ray, world: &World, depth_limit: usize) -> Vec3 {
 }
 
 pub fn raytrace_buffer(image_width: usize, image_height: usize, samples_per_pixel: usize, 
-                       max_depth: usize, world: &World, camera: &Camera) -> Vec<u8> {
+                       max_depth: usize, world: &World, camera: &Camera, callback: Option<&(dyn Fn(String) + Sync)>) -> Vec<u8> {
     (0..image_width*image_height)
         .into_par_iter()
         .flat_map(|i| {
@@ -62,7 +62,10 @@ pub fn raytrace_buffer(image_width: usize, image_height: usize, samples_per_pixe
                     })
                     .sum();
 
-            println!("{}, {}", col, row);
+            if let Some(callback) = callback {
+            //(callback)(String::from("callback"));
+                (callback)(String::from("abc"));
+            }
 
             (pixel_color / samples_per_pixel as f64).rgb()
         })
@@ -71,7 +74,7 @@ pub fn raytrace_buffer(image_width: usize, image_height: usize, samples_per_pixe
 
 pub fn raytrace(name: &str, image_width: usize, image_height: usize, samples_per_pixel: usize, 
                 max_depth: usize, world: &World, camera: &Camera) {
-    let buffer = raytrace_buffer(image_width, image_height, samples_per_pixel, max_depth, world, camera);
+    let buffer = raytrace_buffer(image_width, image_height, samples_per_pixel, max_depth, world, camera, None);
     
     image::save_buffer(name, &buffer[..], image_width as u32, image_height as u32, image::ColorType::Rgb8).unwrap();
 }

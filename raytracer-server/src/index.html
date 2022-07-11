@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Server-sent events</title>
+    <style>
+        p {
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+        }
+    </style>
+</head>
+<body>
+    <div> 
+    <div id="root">
+    </div>
+    <button type="submit" id="submit">Click Me!</button>
+    </div>
+    <script>
+        let root = document.getElementById("root");
+        let test = 0; 
+        document.getElementById("submit").onclick = function() {
+          let events = new EventSource("/render-event/123");
+          events.onmessage = (event) => {
+              console.log(event.data)
+              root.innerText = event.data;
+              if (event.data == "540000") {
+                  events.close();
+              }
+          }
+        }
+
+    </script>
+</body>
+</html>
